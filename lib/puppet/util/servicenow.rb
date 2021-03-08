@@ -200,6 +200,18 @@ module Puppet::Util::Servicenow
   end
   module_function :event_type
 
+  # checks to see if report filter type exists in the event_cond_hash and if set to true
+  # checks for pending as well
+  def report_type_present?(report_type, event_cond_hash)
+    [report_type, "pending_#{report_type}"].each do |type|
+      if(event_cond_hash.key?(type) && event_cond_hash[type] == true)
+        return true
+      end
+    end
+    false
+  end
+  module_function :report_type_present?
+
   def event_security_string(event_security_string)
     security_settings = {
       'Clear' => 0,

@@ -11,6 +11,8 @@ describe 'ServiceNow reporting: event management' do
       skip_certificate_validation: Helpers.skip_cert_check?,
     }
   end
+
+  #require 'pry'; binding pry
   let(:setup_manifest) do
     to_manifest(declare('Service', 'pe-puppetserver'), declare('class', 'servicenow_reporting_integration::event_management', params))
   end

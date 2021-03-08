@@ -7,17 +7,31 @@ Puppet::Reports.register_report(:servicenow) do
 
   def process
     settings_hash = settings
+    ####### add function/logic here to check for the conditions
+    ## get the setting you want from the settings hash (settings={""} to whatever the name is)
+    ## if the conditions = calc-e_cond(rsc_stat) then do everything
+    ## but if not, return or break test it out; or stick everything in an if-else block
+    ######### if too much code, create helper function in the util file and call it
+    event_cond_hash = calculate_event_conditions(resource_statuses)
 
-    case settings_hash['operation_mode']
-    when 'event_management'
-      process_event_management(settings_hash) unless settings_hash['disabled']
-    else
-      # default to incident management
-      process_incident_management(settings_hash)
+    settings_hash['report_filter'].each do |filter|
+      if(report_type_present?(filter, event_cond_hash))
+        case settings_hash['operation_mode']
+        when 'event_management'
+          process_event_management(settings_hash) unless settings_hash['disabled']
+        else
+          # default to incident management
+          process_incident_management(settings_hash)
+        end
+      rescue StandardError => e
+        Puppet.err "servicenow report processor error: #{e}\n#{e.backtrace}"
+      else
+        puts "Event not in the availble filter list"
+
+      end
     end
-  rescue StandardError => e
-    Puppet.err "servicenow report processor error: #{e}\n#{e.backtrace}"
   end
+
 
   def process_event_management(settings_hash)
     event_data = {

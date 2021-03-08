@@ -1,43 +1,45 @@
 # @summary
 #   This class contains the common setup code for servicenow_reporting_integration::incident_management
 #   and servicenow_reporting_integration::event_management.
-# 
+#
 # @api private
 class servicenow_reporting_integration (
   # OPERATION MODE
   Enum['event_management', 'incident_management'] $operation_mode,
   # COMMON PARAMETERS
   String[1] $instance,
-  Optional[String[1]] $user                                                                               = undef,
-  Optional[Sensitive[String[1]]] $password                                                                = undef,
-  Optional[Sensitive[String[1]]] $oauth_token                                                             = undef,
-  Optional[String] $servicenow_credentials_validation_table                                               = undef,
-  Optional[String[1]] $pe_console_url                                                                     = undef,
-  Optional[Array[String[1]]] $include_facts                                                               = ['identity.user', 'ipaddress','memorysize', 'memoryfree', 'os'],
-  Enum['yaml', 'pretty_json', 'json'] $facts_format                                                       = 'pretty_json',
-  Optional[Boolean] $skip_certificate_validation                                                          = false,
-  Optional[Variant[Integer[0], Float[0]]] $http_read_timeout                                              = 60,
-  Optional[Variant[Integer[0], Float[0]]] $http_write_timeout                                             = 60,
-  Enum['selfsigned', 'truststore', 'none'] $pe_console_cert_validation                                    = 'selfsigned',
+  Optional[String[1]] $user                                                                                             = undef,
+  Optional[Sensitive[String[1]]] $password                                                                              = undef,
+  Optional[Sensitive[String[1]]] $oauth_token                                                                           = undef,
+  Optional[String] $servicenow_credentials_validation_table                                                             = undef,
+  Optional[String[1]] $pe_console_url                                                                                   = undef,
+  Optional[Array[String[1]]] $include_facts                                                                             = ['identity.user', 'ipaddress','memorysize', 'memoryfree', 'os'],
+  Enum['yaml', 'pretty_json', 'json'] $facts_format                                                                     = 'pretty_json',
+  Optional[Boolean] $skip_certificate_validation                                                                        = false,
+  Optional[Variant[Integer[0], Float[0]]] $http_read_timeout                                                            = 60,
+  Optional[Variant[Integer[0], Float[0]]] $http_write_timeout                                                           = 60,
+  Enum['selfsigned', 'truststore', 'none'] $pe_console_cert_validation                                                  = 'selfsigned',
+  # PARAMETERS FOR REPORT FILTER
+  Optional[Array[Enum['ok/unchanged', 'intentional_changes', 'corrective_changes', 'failures']]] $report_filter      = ['ok/unchanged', 'intentional_changes', 'corrective_changes', 'failures'],
   # PARAMETERS SPECIFIC TO INCIDENT_MANAGEMENT
-  Optional[String[1]] $caller_id                                                                          = undef,
-  Optional[String[1]] $category                                                                           = undef,
-  Optional[String[1]] $subcategory                                                                        = undef,
-  Optional[String[1]] $contact_type                                                                       = undef,
-  Optional[Integer] $state                                                                                = undef,
-  Optional[Integer] $impact                                                                               = undef,
-  Optional[Integer] $urgency                                                                              = undef,
-  Optional[String[1]] $assignment_group                                                                   = undef,
-  Optional[String[1]] $assigned_to                                                                        = undef,
-  Optional[Servicenow_reporting_integration::IncidentCreationConditions] $incident_creation_conditions    = undef,
+  Optional[String[1]] $caller_id                                                                                        = undef,
+  Optional[String[1]] $category                                                                                         = undef,
+  Optional[String[1]] $subcategory                                                                                      = undef,
+  Optional[String[1]] $contact_type                                                                                     = undef,
+  Optional[Integer] $state                                                                                              = undef,
+  Optional[Integer] $impact                                                                                             = undef,
+  Optional[Integer] $urgency                                                                                            = undef,
+  Optional[String[1]] $assignment_group                                                                                 = undef,
+  Optional[String[1]] $assigned_to                                                                                      = undef,
+  Optional[Servicenow_reporting_integration::IncidentCreationConditions] $incident_creation_conditions                  = undef,
   # PARAMETERS SPECIFIC TO EVENT_MANAGEMENT
-  Optional[Servicenow_reporting_integration::Severity_levels] $failures_event_severity                    = undef,
-  Optional[Servicenow_reporting_integration::Severity_levels] $corrective_changes_event_severity          = undef,
-  Optional[Servicenow_reporting_integration::Severity_levels] $intentional_changes_event_severity         = undef,
-  Optional[Servicenow_reporting_integration::Severity_levels] $pending_corrective_changes_event_severity  = undef,
-  Optional[Servicenow_reporting_integration::Severity_levels] $pending_intentional_changes_event_severity = undef,
-  Optional[Servicenow_reporting_integration::Severity_levels] $no_changes_event_severity                  = undef,
-  Optional[Boolean] $disabled                                                                             = false,
+  Optional[Servicenow_reporting_integration::Severity_levels] $failures_event_severity                                  = undef,
+  Optional[Servicenow_reporting_integration::Severity_levels] $corrective_changes_event_severity                        = undef,
+  Optional[Servicenow_reporting_integration::Severity_levels] $intentional_changes_event_severity                       = undef,
+  Optional[Servicenow_reporting_integration::Severity_levels] $pending_corrective_changes_event_severity                = undef,
+  Optional[Servicenow_reporting_integration::Severity_levels] $pending_intentional_changes_event_severity               = undef,
+  Optional[Servicenow_reporting_integration::Severity_levels] $no_changes_event_severity                                = undef,
+  Optional[Boolean] $disabled                                                                                           = false,
 ) {
   if (($user or $password) and $oauth_token) {
     fail('please specify either user/password or oauth_token not both.')
@@ -126,6 +128,7 @@ class servicenow_reporting_integration (
       http_read_timeout                          => $http_read_timeout,
       http_write_timeout                         => $http_write_timeout,
       pe_console_cert_validation                 => $pe_console_cert_validation,
+      report_filter                              => $report_filter,
       }),
     notify       => $settings_file_notify,
   }
